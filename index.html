@@ -99,8 +99,9 @@
     <select id="menu">
       <option value="15000">Nasi Goreng - Rp15.000</option>
       <option value="12000">Mie Goreng - Rp12.000</option>
-      <option value="10000">Es Teh - Rp10.000</option>
-      <option value="20000">Ayam Geprek - Rp20.000</option>
+      <option value="10000">Es Teh - Rp5.000</option>
+      <option value="10000">Es Jeruk - Rp5.000</option>
+      <option value="20000">Ayam Geprek - Rp13.000</option>
     </select>
 
     <label>Jumlah:</label>
@@ -132,16 +133,42 @@
   <div class="kotak">
     <h2>Laporan Penjualan</h2>
 
+    <p style="font-size:13px;color:#888;margin-top:0;margin-bottom:14px">
+      Laporan ini menampilkan ringkasan statistik penjualan secara otomatis berdasarkan data pesanan yang masuk.
+    </p>
+
+    <!-- Ringkasan Statistik -->
+    <div style="display:flex;gap:12px;margin-bottom:16px">
+      <div style="flex:1;background:#f0f9f4;border:1px solid #a9dfbf;border-radius:6px;padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:bold;color:#27ae60" id="statTotal">Rp0</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">Total Pendapatan</div>
+      </div>
+      <div style="flex:1;background:#f0f6ff;border:1px solid #aac4f0;border-radius:6px;padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:bold;color:#2471a3" id="statJumlah">0</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">Total Transaksi</div>
+      </div>
+      <div style="flex:1;background:#fff8f0;border:1px solid #f0d0a0;border-radius:6px;padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:bold;color:#ca6f1e" id="statRata">Rp0</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">Rata-rata per Transaksi</div>
+      </div>
+    </div>
+
+    <!-- Tabel Rekap per Menu -->
     <table>
       <thead>
         <tr>
           <th>Menu</th>
           <th>Total Terjual</th>
           <th>Total Pendapatan</th>
+          <th>% Kontribusi</th>
         </tr>
       </thead>
       <tbody id="isiLaporan"></tbody>
     </table>
+
+    <p style="font-size:12px;color:#aaa;margin-top:10px;margin-bottom:0">
+      * Rata-rata per transaksi = Total Pendapatan ÷ Jumlah Transaksi &nbsp;|&nbsp; % Kontribusi = Pendapatan per Menu ÷ Total Pendapatan × 100
+    </p>
   </div>
 
   <script>
@@ -193,14 +220,25 @@
     }
 
     function updateLaporan() {
+      // Hitung statistik ringkasan
+      var jumlahTransaksi = document.getElementById('isiTabel').rows.length;
+      var rata = jumlahTransaksi > 0 ? Math.round(totalSemua / jumlahTransaksi) : 0;
+
+      document.getElementById('statTotal').innerText = 'Rp' + totalSemua.toLocaleString('id-ID');
+      document.getElementById('statJumlah').innerText = jumlahTransaksi;
+      document.getElementById('statRata').innerText = 'Rp' + rata.toLocaleString('id-ID');
+
+      // Isi tabel rekap per menu + persentase kontribusi
       var tbody = document.getElementById('isiLaporan');
       tbody.innerHTML = '';
 
       for (var menu in rekap) {
+        var persen = totalSemua > 0 ? ((rekap[menu].pendapatan / totalSemua) * 100).toFixed(1) : 0;
         var baris = tbody.insertRow();
         baris.insertCell(0).innerText = menu;
         baris.insertCell(1).innerText = rekap[menu].terjual + ' porsi';
         baris.insertCell(2).innerText = 'Rp' + rekap[menu].pendapatan.toLocaleString('id-ID');
+        baris.insertCell(3).innerText = persen + '%';
       }
     }
   </script>
