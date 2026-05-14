@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aplikasi Pemesanan Makanan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    h2 {
+      color: #444;
+      font-size: 16px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
+    }
+
+    .kotak {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1e8449;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #f5f5f5;
+    }
+
+    .total {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: right;
+      color: #27ae60;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Aplikasi Pemesanan Makanan</h1>
+
+  <!-- Form Pesanan -->
+  <div class="kotak">
+    <h2>Form Pesanan</h2>
+
+    <label>Nama Pembeli:</label>
+    <input type="text" id="nama" placeholder="Contoh: Budi" />
+
+    <label>Pilih Menu:</label>
+    <select id="menu">
+      <option value="15000">Nasi Goreng - Rp15.000</option>
+      <option value="12000">Mie Goreng - Rp12.000</option>
+      <option value="10000">Es Teh - Rp10.000</option>
+      <option value="20000">Ayam Geprek - Rp20.000</option>
+    </select>
+
+    <label>Jumlah:</label>
+    <input type="number" id="jumlah" value="1" min="1" />
+
+    <button onclick="tambahPesanan()">Tambah Pesanan</button>
+  </div>
+
+  <!-- Daftar Pesanan -->
+  <div class="kotak">
+    <h2>Daftar Pesanan</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Menu</th>
+          <th>Jumlah</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="isiTabel"></tbody>
+    </table>
+
+    <div class="total" id="grandTotal">Total: Rp0</div>
+  </div>
+
+  <!-- Laporan -->
+  <div class="kotak">
+    <h2>Laporan Penjualan</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Menu</th>
+          <th>Total Terjual</th>
+          <th>Total Pendapatan</th>
+        </tr>
+      </thead>
+      <tbody id="isiLaporan"></tbody>
+    </table>
+  </div>
+
+  <script>
+    var totalSemua = 0;
+    var rekap = {};
+
+    function tambahPesanan() {
+      var nama = document.getElementById('nama').value;
+      var menuEl = document.getElementById('menu');
+      var namaMenu = menuEl.options[menuEl.selectedIndex].text;
+      var harga = parseInt(menuEl.value);
+      var jumlah = parseInt(document.getElementById('jumlah').value);
+
+      if (nama == '') {
+        alert('Nama pembeli harus diisi!');
+        return;
+      }
+
+      if (jumlah < 1) {
+        alert('Jumlah minimal 1!');
+        return;
+      }
+
+      var subtotal = harga * jumlah;
+      totalSemua += subtotal;
+
+      // Tambah baris ke tabel pesanan
+      var tbody = document.getElementById('isiTabel');
+      var baris = tbody.insertRow();
+      baris.insertCell(0).innerText = nama;
+      baris.insertCell(1).innerText = namaMenu;
+      baris.insertCell(2).innerText = jumlah;
+      baris.insertCell(3).innerText = 'Rp' + subtotal.toLocaleString('id-ID');
+
+      // Update grand total
+      document.getElementById('grandTotal').innerText = 'Total: Rp' + totalSemua.toLocaleString('id-ID');
+
+      // Update rekap laporan
+      if (rekap[namaMenu] == undefined) {
+        rekap[namaMenu] = { terjual: 0, pendapatan: 0 };
+      }
+      rekap[namaMenu].terjual += jumlah;
+      rekap[namaMenu].pendapatan += subtotal;
+      updateLaporan();
+
+      // Kosongkan form
+      document.getElementById('nama').value = '';
+      document.getElementById('jumlah').value = 1;
+    }
+
+    function updateLaporan() {
+      var tbody = document.getElementById('isiLaporan');
+      tbody.innerHTML = '';
+
+      for (var menu in rekap) {
+        var baris = tbody.insertRow();
+        baris.insertCell(0).innerText = menu;
+        baris.insertCell(1).innerText = rekap[menu].terjual + ' porsi';
+        baris.insertCell(2).innerText = 'Rp' + rekap[menu].pendapatan.toLocaleString('id-ID');
+      }
+    }
+  </script>
+
+</body>
+</html>
